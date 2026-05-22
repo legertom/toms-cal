@@ -2,25 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
+import { LocalTime, LocalTimeShort } from "./LocalTime";
 
 export const dynamic = "force-dynamic";
-
-const HYDRATE_SCRIPT = `
-  (function(){
-    document.querySelectorAll('time[data-iso]').forEach(function(el){
-      var d = new Date(el.getAttribute('data-iso'));
-      var timeOnly = el.getAttribute('data-time-only') === '1';
-      el.textContent = new Intl.DateTimeFormat(undefined, {
-        weekday: timeOnly ? undefined : 'long',
-        month: timeOnly ? undefined : 'long',
-        day: timeOnly ? undefined : 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        timeZoneName: 'short',
-      }).format(d);
-    });
-  })();
-`;
 
 export default async function ConfirmedPage({
   params,
@@ -55,9 +39,6 @@ export default async function ConfirmedPage({
 
   if (!booking || booking.meetingTypeSlug !== slug) notFound();
 
-  const startISO = booking.startTime.toISOString();
-  const endISO = booking.endTime.toISOString();
-
   return (
     <main className="mx-auto max-w-2xl px-6 py-16">
       <div className="rounded-[12px] border border-border bg-white p-8 text-center sm:p-10">
@@ -76,11 +57,11 @@ export default async function ConfirmedPage({
           <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
             {booking.meetingTypeName}
           </div>
-          <div className="mt-1 font-serif text-lg font-bold text-navy">
-            <ClientTime iso={startISO} />
+          <div className="mt-1">
+            <LocalTime iso={booking.startTime.toISOString()} />
           </div>
-          <div className="text-xs text-muted-foreground">
-            until <ClientTime iso={endISO} timeOnly />
+          <div className="mt-2 text-xs text-muted-foreground">
+            until <LocalTimeShort iso={booking.endTime.toISOString()} />
           </div>
           {booking.meetLink && (
             <a
@@ -101,28 +82,6 @@ export default async function ConfirmedPage({
           ← back to booking page
         </Link>
       </div>
-      <script dangerouslySetInnerHTML={{ __html: HYDRATE_SCRIPT }} />
     </main>
-  );
-}
-
-function ClientTime({ iso, timeOnly }: { iso: string; timeOnly?: boolean }) {
-  const fallback = new Intl.DateTimeFormat("en-US", {
-    weekday: timeOnly ? undefined : "long",
-    month: timeOnly ? undefined : "long",
-    day: timeOnly ? undefined : "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    timeZone: "UTC",
-    timeZoneName: "short",
-  }).format(new Date(iso));
-  return (
-    <time
-      data-iso={iso}
-      data-time-only={timeOnly ? "1" : "0"}
-      suppressHydrationWarning
-    >
-      {fallback}
-    </time>
   );
 }
