@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { requireOwner } from "@/lib/auth-guard";
+import { zoomEnabled } from "@/lib/zoom";
 import { MeetingTypeForm } from "../MeetingTypeForm";
 import { createMeetingType } from "../actions";
 
 export default async function NewMeetingTypePage() {
   await requireOwner();
+  const allowZoom = zoomEnabled();
   return (
     <div className="mx-auto max-w-2xl">
       <Link
@@ -25,7 +27,11 @@ export default async function NewMeetingTypePage() {
       </p>
 
       <div className="mt-8 rounded-[12px] border border-border bg-white p-6">
-        <MeetingTypeForm action={createMeetingType} submitLabel="Create" />
+        <MeetingTypeForm
+          action={createMeetingType}
+          submitLabel="Create"
+          allowZoom={allowZoom}
+        />
       </div>
     </div>
   );
