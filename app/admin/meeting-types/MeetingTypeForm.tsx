@@ -109,6 +109,7 @@ export function MeetingTypeForm({
             className="w-full rounded-[8px] border border-border bg-white px-3 py-2 text-sm focus:border-blue focus:outline-none"
           >
             <option value="google_meet">Google Meet</option>
+            <option value="zoom">Zoom</option>
             <option value="in_person">In person</option>
             <option value="phone">Phone</option>
           </select>

@@ -22,7 +22,7 @@ const meetingTypeSchema = z.object({
   bufferAfterMinutes: z.coerce.number().int().min(0).max(120),
   advanceWindowDays: z.coerce.number().int().min(1).max(180),
   minNoticeMinutes: z.coerce.number().int().min(0).max(10080),
-  locationType: z.enum(["google_meet", "in_person", "phone"]),
+  locationType: z.enum(["google_meet", "zoom", "in_person", "phone"]),
   isActive: z
     .union([z.literal("on"), z.literal("true"), z.boolean()])
     .optional()

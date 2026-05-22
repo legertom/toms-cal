@@ -22,6 +22,9 @@ export default async function AdminLayout({
               toms-cal admin
             </Link>
             <nav className="flex items-center gap-5 text-sm font-medium text-muted-foreground">
+              <Link href="/admin/bookings" className="hover:text-navy">
+                Bookings
+              </Link>
               <Link href="/admin/meeting-types" className="hover:text-navy">
                 Meeting types
               </Link>

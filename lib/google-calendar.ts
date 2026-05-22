@@ -112,3 +112,35 @@ export async function createCalendarEvent(args: {
     htmlLink: data.htmlLink,
   };
 }
+
+/**
+ * Deletes a Google Calendar event with sendUpdates=all so Google emails
+ * the attendee an official cancellation notice. Best-effort: logs and
+ * returns false on failure rather than throwing, so the caller can still
+ * mark the booking cancelled even if Google is unreachable.
+ */
+export async function deleteCalendarEvent(args: {
+  userId: string;
+  eventId: string;
+}): Promise<boolean> {
+  try {
+    const accessToken = await getGoogleAccessToken(args.userId);
+    const url = new URL(
+      `https://www.googleapis.com/calendar/v3/calendars/primary/events/${encodeURIComponent(args.eventId)}`
+    );
+    url.searchParams.set("sendUpdates", "all");
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    // 204 = success, 410 = already deleted (also OK)
+    if (res.ok || res.status === 410) return true;
+    console.error(
+      `Google event delete failed: ${res.status} ${await res.text().catch(() => "")}`
+    );
+    return false;
+  } catch (err) {
+    console.error("Google event delete threw:", err);
+    return false;
+  }
+}

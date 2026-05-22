@@ -24,7 +24,7 @@ export default async function ConfirmedPage({
       attendeeEmail: schema.bookings.attendeeEmail,
       startTime: schema.bookings.startTime,
       endTime: schema.bookings.endTime,
-      meetLink: schema.bookings.googleMeetLink,
+      meetingUrl: schema.bookings.meetingUrl,
       meetingTypeName: schema.meetingTypes.name,
       meetingTypeSlug: schema.meetingTypes.slug,
       locationType: schema.meetingTypes.locationType,
@@ -63,14 +63,16 @@ export default async function ConfirmedPage({
           <div className="mt-2 text-xs text-muted-foreground">
             until <LocalTimeShort iso={booking.endTime.toISOString()} />
           </div>
-          {booking.meetLink && (
+          {booking.meetingUrl && (
             <a
-              href={booking.meetLink}
+              href={booking.meetingUrl}
               target="_blank"
               rel="noreferrer"
               className="mt-3 inline-block text-sm font-medium text-blue hover:text-blue-hover"
             >
-              Google Meet link →
+              {booking.locationType === "zoom"
+                ? "Join Zoom →"
+                : "Google Meet link →"}
             </a>
           )}
         </div>

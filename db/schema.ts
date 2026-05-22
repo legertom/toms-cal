@@ -134,7 +134,13 @@ export const bookings = pgTable(
     aiAgenda: text("ai_agenda"),
     googleEventId: text("google_event_id"),
     googleMeetLink: text("google_meet_link"),
+    // Provider-agnostic join URL shown to the attendee (Google Meet or Zoom).
+    meetingUrl: text("meeting_url"),
+    // Zoom meeting numeric id, needed to cancel the meeting via the Zoom API.
+    zoomMeetingId: text("zoom_meeting_id"),
+    // confirmed | cancelled
     status: text("status").notNull().default("confirmed"),
+    cancelledAt: timestamp("cancelled_at", { mode: "date", withTimezone: true }),
     createdAt: timestamp("created_at", { mode: "date" })
       .notNull()
       .defaultNow(),

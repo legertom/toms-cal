@@ -24,7 +24,7 @@ export default async function AdminOverview() {
     .select({ total: count() })
     .from(schema.bookings)
     .where(
-      sql`${schema.bookings.ownerId} = ${session.user.id} and ${schema.bookings.startTime} >= ${now.toISOString()}`
+      sql`${schema.bookings.ownerId} = ${session.user.id} and ${schema.bookings.startTime} >= ${now.toISOString()} and ${schema.bookings.status} = 'confirmed'`
     );
 
   const setupComplete =
@@ -73,7 +73,7 @@ export default async function AdminOverview() {
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Stat label="Meeting types" value={`${meetingTypeStats.active} / ${meetingTypeStats.total}`} sub="active / total" href="/admin/meeting-types" />
         <Stat label="Weekly availability rules" value={String(availabilityCount.total)} sub="windows defined" href="/admin/availability" />
-        <Stat label="Upcoming bookings" value={String(upcomingBookings.total)} sub="from now on" />
+        <Stat label="Upcoming bookings" value={String(upcomingBookings.total)} sub="from now on" href="/admin/bookings" />
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import { and, eq, gte, lte, or, asc } from "drizzle-orm";
 import { z } from "zod";
 import { db, schema } from "@/db";
 import { createCalendarEvent, getBusyBlocks } from "@/lib/google-calendar";
+import { createZoomMeeting, zoomEnabled } from "@/lib/zoom";
 import { computeAvailableSlots } from "@/lib/slots";
 
 const bookingSchema = z.object({
@@ -120,7 +121,42 @@ export async function createBooking(
     };
   }
 
-  // Create the Google Calendar event (sends the invite automatically).
+  // 1) If Zoom is the requested location, create the Zoom meeting first so
+  //    the join URL can be included in the Google Calendar event description.
+  let zoomMeetingId: string | null = null;
+  let zoomJoinUrl: string | null = null;
+  if (meetingType.locationType === "zoom") {
+    if (!zoomEnabled()) {
+      return {
+        ok: false,
+        fieldErrors: {},
+        formError:
+          "Zoom isn't configured for this app yet. Pick another time or contact the owner.",
+      };
+    }
+    try {
+      const zm = await createZoomMeeting({
+        topic: meetingType.name,
+        agenda: notes || undefined,
+        start: slotStartDate,
+        durationMinutes: meetingType.durationMinutes,
+        attendeeEmail,
+      });
+      zoomMeetingId = zm.id;
+      zoomJoinUrl = zm.joinUrl;
+    } catch (err) {
+      console.error("Zoom create failed:", err);
+      return {
+        ok: false,
+        fieldErrors: {},
+        formError:
+          "Couldn't create the Zoom meeting. Try again, or contact the owner directly.",
+      };
+    }
+  }
+
+  // 2) Create the Google Calendar event with the attendee. Google sends the
+  //    invite email automatically via sendUpdates=all.
   let event;
   try {
     event = await createCalendarEvent({
@@ -131,7 +167,9 @@ export async function createBooking(
         attendeeName,
         attendeeEmail,
         notes: notes || undefined,
+        zoomJoinUrl,
       }),
+      location: zoomJoinUrl ?? undefined,
       start: slotStartDate,
       end: slotEndDate,
       attendeeEmail,
@@ -148,6 +186,8 @@ export async function createBooking(
     };
   }
 
+  const meetingUrl = zoomJoinUrl ?? event.hangoutLink ?? null;
+
   const [inserted] = await db
     .insert(schema.bookings)
     .values({
@@ -160,6 +200,8 @@ export async function createBooking(
       notes: notes || null,
       googleEventId: event.id,
       googleMeetLink: event.hangoutLink ?? null,
+      meetingUrl,
+      zoomMeetingId,
       status: "confirmed",
     })
     .returning({ id: schema.bookings.id });
@@ -172,10 +214,14 @@ function buildDescription(args: {
   attendeeName: string;
   attendeeEmail: string;
   notes?: string;
+  zoomJoinUrl?: string | null;
 }): string {
   const lines = [
     `${args.meetingTypeName} with ${args.attendeeName} (${args.attendeeEmail})`,
   ];
+  if (args.zoomJoinUrl) {
+    lines.push("", `Join Zoom: ${args.zoomJoinUrl}`);
+  }
   if (args.notes) {
     lines.push("", "Notes from attendee:", args.notes);
   }
