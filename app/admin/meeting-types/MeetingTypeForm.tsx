@@ -22,7 +22,6 @@ export function MeetingTypeForm({
   action,
   initial,
   submitLabel,
-  allowZoom = false,
 }: {
   action: (
     prev: MeetingTypeFormState | undefined,
@@ -30,7 +29,6 @@ export function MeetingTypeForm({
   ) => Promise<MeetingTypeFormState>;
   initial?: MeetingTypeValues;
   submitLabel: string;
-  allowZoom?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(action, undefined);
   const errors = state?.ok === false ? state.fieldErrors : {};
@@ -82,41 +80,28 @@ export function MeetingTypeForm({
         />
       </Field>
 
-      <div className="grid grid-cols-2 gap-4">
-        <Field
-          label="Duration (minutes)"
-          htmlFor="durationMinutes"
-          error={errors.durationMinutes?.[0]}
-        >
-          <input
-            id="durationMinutes"
-            name="durationMinutes"
-            type="number"
-            min={5}
-            max={480}
-            defaultValue={initial?.durationMinutes ?? 30}
-            required
-            className="w-full rounded-[8px] border border-border bg-white px-3 py-2 text-sm focus:border-blue focus:outline-none"
-          />
-        </Field>
-        <Field
-          label="Location"
-          htmlFor="locationType"
-          error={errors.locationType?.[0]}
-        >
-          <select
-            id="locationType"
-            name="locationType"
-            defaultValue={initial?.locationType ?? "google_meet"}
-            className="w-full rounded-[8px] border border-border bg-white px-3 py-2 text-sm focus:border-blue focus:outline-none"
-          >
-            <option value="google_meet">Google Meet</option>
-            {allowZoom && <option value="zoom">Zoom</option>}
-            <option value="in_person">In person</option>
-            <option value="phone">Phone</option>
-          </select>
-        </Field>
-      </div>
+      <Field
+        label="Duration (minutes)"
+        htmlFor="durationMinutes"
+        error={errors.durationMinutes?.[0]}
+      >
+        <input
+          id="durationMinutes"
+          name="durationMinutes"
+          type="number"
+          min={5}
+          max={480}
+          defaultValue={initial?.durationMinutes ?? 30}
+          required
+          className="w-full rounded-[8px] border border-border bg-white px-3 py-2 text-sm focus:border-blue focus:outline-none"
+        />
+      </Field>
+
+      <input
+        type="hidden"
+        name="locationType"
+        value={initial?.locationType ?? "video_call"}
+      />
 
       <div className="grid grid-cols-2 gap-4">
         <Field

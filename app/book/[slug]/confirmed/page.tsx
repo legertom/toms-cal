@@ -24,10 +24,8 @@ export default async function ConfirmedPage({
       attendeeEmail: schema.bookings.attendeeEmail,
       startTime: schema.bookings.startTime,
       endTime: schema.bookings.endTime,
-      meetingUrl: schema.bookings.meetingUrl,
       meetingTypeName: schema.meetingTypes.name,
       meetingTypeSlug: schema.meetingTypes.slug,
-      locationType: schema.meetingTypes.locationType,
     })
     .from(schema.bookings)
     .innerJoin(
@@ -63,18 +61,11 @@ export default async function ConfirmedPage({
           <div className="mt-2 text-xs text-muted-foreground">
             until <LocalTimeShort iso={booking.endTime.toISOString()} />
           </div>
-          {booking.meetingUrl && (
-            <a
-              href={booking.meetingUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-3 inline-block text-sm font-medium text-blue hover:text-blue-hover"
-            >
-              {booking.locationType === "zoom"
-                ? "Join Zoom →"
-                : "Google Meet link →"}
-            </a>
-          )}
+          <div className="mt-3 rounded-[8px] bg-white px-3 py-2 text-xs text-muted-foreground">
+            <strong className="text-navy">Zoom link coming.</strong> Tom will
+            add the video link to your calendar invite shortly — you&apos;ll
+            get an updated invite from Google when that happens.
+          </div>
         </div>
 
         <Link

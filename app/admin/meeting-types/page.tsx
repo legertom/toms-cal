@@ -71,7 +71,6 @@ export default async function MeetingTypesPage() {
                     <code className="rounded bg-muted px-1 py-0.5">/book/{t.slug}</code>
                   </span>
                   <span>{t.durationMinutes} min</span>
-                  <span>{formatLocation(t.locationType)}</span>
                   {(t.bufferBeforeMinutes > 0 || t.bufferAfterMinutes > 0) && (
                     <span>
                       Buffer {t.bufferBeforeMinutes}/{t.bufferAfterMinutes} min
@@ -106,9 +105,3 @@ export default async function MeetingTypesPage() {
   );
 }
 
-function formatLocation(t: string) {
-  if (t === "google_meet") return "Google Meet";
-  if (t === "in_person") return "In person";
-  if (t === "phone") return "Phone";
-  return t;
-}

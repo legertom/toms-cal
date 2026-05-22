@@ -103,7 +103,7 @@ export default async function BookingPage({
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
           <span className="font-medium">{meetingType.durationMinutes} min</span>
           <span className="opacity-40">·</span>
-          <span>{formatLocation(meetingType.locationType)}</span>
+          <span>Video call — link added after confirmation</span>
         </div>
         {meetingType.description && (
           <p className="mt-4 max-w-prose text-sm leading-relaxed text-foreground">
@@ -136,9 +136,3 @@ export default async function BookingPage({
   );
 }
 
-function formatLocation(t: string) {
-  if (t === "google_meet") return "Google Meet";
-  if (t === "in_person") return "In person";
-  if (t === "phone") return "Phone";
-  return t;
-}

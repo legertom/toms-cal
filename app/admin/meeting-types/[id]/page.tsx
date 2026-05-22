@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { requireOwner } from "@/lib/auth-guard";
-import { zoomEnabled } from "@/lib/zoom";
 import { db, schema } from "@/db";
 import { MeetingTypeForm } from "../MeetingTypeForm";
 import { updateMeetingType, deleteMeetingType } from "../actions";
@@ -30,7 +29,6 @@ export default async function EditMeetingTypePage({
 
   const update = updateMeetingType.bind(null, id);
   const del = deleteMeetingType.bind(null, id);
-  const allowZoom = zoomEnabled();
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -54,7 +52,6 @@ export default async function EditMeetingTypePage({
         <MeetingTypeForm
           action={update}
           submitLabel="Save changes"
-          allowZoom={allowZoom}
           initial={{
             id: type.id,
             slug: type.slug,

@@ -22,7 +22,12 @@ const meetingTypeSchema = z.object({
   bufferAfterMinutes: z.coerce.number().int().min(0).max(120),
   advanceWindowDays: z.coerce.number().int().min(1).max(180),
   minNoticeMinutes: z.coerce.number().int().min(0).max(10080),
-  locationType: z.enum(["google_meet", "zoom", "in_person", "phone"]),
+  // Currently hidden from the UI — bookings create a bare calendar event and
+  // the owner adds the meeting link manually after confirmation.
+  locationType: z
+    .enum(["video_call", "google_meet", "zoom", "in_person", "phone"])
+    .optional()
+    .default("video_call"),
   isActive: z
     .union([z.literal("on"), z.literal("true"), z.boolean()])
     .optional()

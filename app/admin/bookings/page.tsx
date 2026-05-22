@@ -17,12 +17,9 @@ export default async function BookingsAdminPage() {
       startTime: schema.bookings.startTime,
       endTime: schema.bookings.endTime,
       notes: schema.bookings.notes,
-      meetingUrl: schema.bookings.meetingUrl,
       googleEventId: schema.bookings.googleEventId,
-      zoomMeetingId: schema.bookings.zoomMeetingId,
       status: schema.bookings.status,
       meetingTypeName: schema.meetingTypes.name,
-      locationType: schema.meetingTypes.locationType,
     })
     .from(schema.bookings)
     .innerJoin(
@@ -100,24 +97,12 @@ export default async function BookingsAdminPage() {
                     {formatDateTime(b.startTime)} – {formatTime(b.endTime)}
                   </div>
                   <div className="mt-0.5 text-xs text-muted-foreground">
-                    {b.meetingTypeName} · {formatLocation(b.locationType)}
+                    {b.meetingTypeName}
                   </div>
                   {b.notes && (
                     <div className="mt-2 rounded-[8px] bg-muted px-3 py-2 text-xs text-muted-foreground">
                       {b.notes}
                     </div>
-                  )}
-                  {b.meetingUrl && b.status === "confirmed" && (
-                    <a
-                      href={b.meetingUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-2 inline-block text-xs font-medium text-blue hover:text-blue-hover"
-                    >
-                      {b.locationType === "zoom"
-                        ? "Open Zoom →"
-                        : "Open Meet →"}
-                    </a>
                   )}
                 </div>
                 {b.status === "confirmed" && (
@@ -199,10 +184,3 @@ function formatTime(d: Date): string {
   }).format(d);
 }
 
-function formatLocation(t: string) {
-  if (t === "google_meet") return "Google Meet";
-  if (t === "zoom") return "Zoom";
-  if (t === "in_person") return "In person";
-  if (t === "phone") return "Phone";
-  return t;
-}
